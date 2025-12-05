@@ -1,0 +1,1264 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>EduClick - v13 Final</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    /* --- 1. DESIGN TOKENS (Dark Mode) --- */
+    :root {
+      --bg-app: #0f172a;
+      --bg-sidebar: #1e293b;
+      --bg-card: #1e293b;
+      --bg-hover: #334155;
+      
+      --primary: #6366f1; /* Indigo */
+      --primary-hover: #4f46e5;
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+      
+      --radius: 12px;
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      --border: 1px solid #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg-app); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; }
+
+    /* --- 2. UTILITIES --- */
+    .hidden { display: none !important; }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-2 { gap: 0.5rem; } .gap-4 { gap: 1rem; }
+    .w-full { width: 100%; }
+    .text-sm { font-size: 0.875rem; }
+    .font-bold { font-weight: 700; }
+    
+    .badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;}
+    .badge-red { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-green { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-warn { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+    /* --- 3. LOGIN SCREEN --- */
+    #login-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        z-index: 9999; display: flex; align-items: center; justify-content: center;
+    }
+    .login-box {
+        background: var(--bg-card); padding: 40px; border-radius: 20px;
+        width: 100%; max-width: 400px; box-shadow: var(--shadow);
+        border: var(--border); text-align: center;
+    }
+    .login-box input {
+        width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px;
+        background: var(--bg-app); border: var(--border); color: var(--text-main);
+    }
+    .login-box button {
+        width: 100%; padding: 12px; margin-top: 10px; font-size: 16px;
+    }
+
+    /* --- 4. LAYOUT & NAV --- */
+    aside {
+        width: 260px; background: var(--bg-sidebar); border-right: var(--border);
+        display: flex; flex-direction: column; padding: 20px;
+    }
+    .logo { font-size: 20px; font-weight: 800; color: white; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+    .logo i { color: var(--primary); }
+    
+    .nav-item {
+        padding: 12px 16px; border-radius: 10px; color: var(--text-muted);
+        text-decoration: none; display: flex; align-items: center; gap: 12px;
+        margin-bottom: 5px; transition: 0.2s; cursor: pointer;
+    }
+    .nav-item:hover, .nav-item.active { background: var(--primary); color: white; }
+    
+    main { flex: 1; padding: 30px; overflow-y: auto; }
+    
+    /* --- 5. COMPONENTS --- */
+    .card { background: var(--bg-card); border-radius: var(--radius); padding: 24px; border: var(--border); margin-bottom: 24px; }
+    
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .stat-box { background: var(--bg-card); border: var(--border); padding: 20px; border-radius: 16px; position: relative; overflow: hidden; }
+    .stat-value { font-size: 32px; font-weight: 800; margin: 10px 0 5px; }
+    .stat-label { color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+    
+    /* Buttons */
+    .btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-danger { background: rgba(239,68,68,0.2); color: var(--danger); }
+    .btn-danger:hover { background: var(--danger); color: white; }
+    .btn-success { background: rgba(16,185,129,0.2); color: var(--success); }
+    .btn-success:hover { background: var(--success); color: white; }
+    .btn-warn { background: rgba(245,158,11,0.2); color: var(--warning); }
+    .btn-warn:hover { background: var(--warning); color: white; }
+    .btn-secondary { background: rgba(255,255,255,0.1); color: var(--text-main); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+    
+    .control-bar { display: flex; gap: 15px; margin-bottom: 20px; background: #1e293b; padding: 15px; border-radius: 12px; border: var(--border); flex-wrap: wrap; }
+    select, input { background: #0f172a; border: 1px solid #334155; color: white; padding: 10px; border-radius: 8px; outline: none; }
+    
+    /* Tables */
+    .table-responsive { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    th { text-align: left; padding: 15px; color: var(--text-muted); font-size: 12px; text-transform: uppercase; border-bottom: var(--border); }
+    td { padding: 15px; border-bottom: 1px solid #334155; vertical-align: middle; }
+    
+    /* Profile Details */
+    .detail-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-bottom: 8px; }
+    .detail-label { color: var(--text-muted); font-weight: 500; }
+    .detail-full-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+
+    /* Schedule specific */
+    .schedule-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; } 
+    .schedule-day { background: #151d2e; border-radius: 8px; padding: 15px; border: 1px solid #334155; }
+    .day-title { color: var(--primary); font-weight: 700; margin-bottom: 10px; text-transform: uppercase; font-size: 14px; text-align: center; }
+    .lesson-row { padding: 8px 0; border-bottom: 1px dashed #334155; font-size: 13px; }
+    .lesson-time { color: var(--text-muted); font-size: 11px; display: block; }
+
+    /* Pagination */
+    .pagination-controls { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; }
+    .pagination-controls button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  </style>
+</head>
+<body>
+
+<div id="toast" style="position: fixed; bottom: 30px; right: 30px; background: #1e293b; color: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10000; font-weight: 500; display: flex; align-items: center; gap: 10px; visibility:hidden; opacity:0; transition: all 0.4s;"></div>
+
+<div id="login-screen">
+    <div class="login-box">
+        <h1 style="color:var(--primary); margin-bottom: 20px;"><i class="fa-solid fa-lock"></i> Вход в систему EduClick</h1>
+        
+        <input type="text" id="login-username" placeholder="Логин" value="admin">
+        <input type="password" id="login-password" placeholder="Пароль" value="123">
+        <p class="text-sm" style="color:var(--danger);" id="login-error-message"></p>
+        <button class="btn btn-primary w-full" onclick="handleLogin()">Войти</button>
+        <p class="text-sm text-muted" style="margin-top: 20px;">
+            **Тестовые данные:** Директор: `admin`/`123` | Препод: `teacher101`/`123` | Студент: `student1`/`123`
+        </p>
+    </div>
+</div>
+
+<div id="app-container" class="hidden w-full">
+    <aside>
+        <div class="logo"><i class="fa-solid fa-building-columns"></i> EduClick</div>
+        
+        <div id="nav-menu">
+            <div class="nav-item active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-pie"></i> Дашборд/Профиль</div>
+            <div class="nav-item" onclick="switchTab('schedule')"><i class="fa-solid fa-calendar-days"></i> Расписание</div>
+            <div id="teacher-journal-tab" class="nav-item hidden" onclick="switchTab('journal')"><i class="fa-solid fa-graduation-cap"></i> Журнал</div>
+            <div id="admin-tab" class="nav-item hidden" onclick="switchTab('admin')"><i class="fa-solid fa-user-shield"></i> Управление (CRUD)</div>
+            <div id="director-departments-tab" class="nav-item hidden" onclick="switchTab('departments')"><i class="fa-solid fa-sitemap"></i> Отделы</div>
+        </div>
+
+        <div style="margin-top: auto;">
+            <div class="nav-item" style="background: rgba(255,255,255,0.05); cursor: default;">
+                <i class="fa-solid fa-user-circle"></i>
+                <div>
+                    <div id="user-name" style="font-size: 12px; font-weight: 700;">User</div>
+                    <div id="user-role" style="font-size: 10px; color: var(--text-muted);">Role</div>
+                </div>
+            </div>
+            <div class="nav-item" onclick="logout()" style="color: var(--danger); margin-top: 10px;">
+                <i class="fa-solid fa-sign-out-alt"></i> Выйти
+            </div>
+        </div>
+    </aside>
+
+    <main>
+        <header class="flex justify-between items-center" style="margin-bottom: 30px;">
+            <h2 id="page-title" style="font-size: 24px; font-weight: 700;">Обзор</h2>
+        </header>
+        <div id="content-area"></div>
+    </main>
+</div>
+
+<script>
+    // #################################################################################
+    // ##                           1. CORE CONSTANTS & DATA MANAGEMENT               ##
+    // #################################################################################
+    
+    const DB_KEY = 'EduClick_v10_DB';
+    const MISS_FEE = 60;
+    const STUDENTS_PER_GROUP = 30; 
+    const STUDENTS_PER_PAGE = 10; 
+
+    // Static Data for initial generation
+    const GROUPS = [ 'КТ-201', 'ПД-202', 'ИБ-101', 'ЭК-303', 'МЕ-105', 'ЛГ-301', 'ИТ-204', 'АР-102', 'ТХ-309', 'ДЗ-106', 'ВК-304', 'ИН-205', 'ФН-103', 'ГЕ-401', 'ЮР-107', 'МР-208', 'ОП-310', 'БХ-212', 'СТ-115', 'АВ-404' ]; 
+    const SUBJECTS = [ 'Математика', 'Физика', 'Информатика', 'История', 'Английский', 'Физкультура', 'Химия', 'Биология', 'География', 'Экономика', 'Философия', 'Программирование', 'Дизайн', 'Менеджмент', 'Право', 'Электротехника', 'Статистика', 'ОБЖ', 'Сети', 'Базы Данных' ]; 
+    const DEPARTMENTS_DATA = [
+        { name: "Административный", head: "Александр Борисович", duties: "Общее руководство, бюджетирование" },
+        { name: "Учебная Часть", head: "Ирина Петрова", duties: "Составление расписаний, контроль успеваемости" },
+        { name: "Кафедра IT", head: "Сергей Иванов", duties: "Информатика, Программирование, Сети" },
+        { name: "Кафедра Естественных Наук", head: "Дамир Кадыров", duties: "Физика, Химия, Биология" },
+        { name: "Финансовый Отдел", head: "Елена Смирнова", duties: "Оплата обучения, расчет долгов, стипендии" }
+    ];
+    const RANKS = ['Старший преподаватель', 'Преподаватель', 'Доцент', 'Профессор', 'Ассистент', 'Кандидат наук'];
+    const TOPICS = ["Интегралы", "Законы Ньютона", "Базы данных SQL", "Смутное время", "Present Perfect", "Органическая химия", "Генетика", "Теория вероятности", "Макроэкономика", "Этика"];
+    const TIMESLOTS = ["08:30", "10:00", "11:30", "13:30", "15:00", "16:30"];
+    const DAYS = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница"];
+
+    // Default Structure (будет перезаписана из LocalStorage)
+    let db = {
+        students: [],
+        teachers: [], 
+        director: {},
+        subjects: {},
+        schedule: {},
+        groups: [...GROUPS],
+        departments: DEPARTMENTS_DATA
+    };
+    
+    // --- Data Persistence ---
+    function saveDB() {
+        try {
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            console.log("DB saved to localStorage.");
+        } catch(e) {
+            console.error("Could not save to localStorage:", e);
+        }
+    }
+
+    function loadDB() {
+        try {
+            const data = localStorage.getItem(DB_KEY);
+            if (data) {
+                db = JSON.parse(data);
+                console.log("DB loaded from localStorage.");
+                // Ensure groups list is updated if new groups were added via teacher action
+                db.groups = [...new Set(db.groups.concat(db.students.map(s => s.group)))].filter(g => g);
+                return true;
+            }
+        } catch(e) {
+            console.error("Could not load/parse DB from localStorage:", e);
+        }
+        return false; // Return false if no data or error, forcing generation
+    }
+
+    // --- Helper Functions ---
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function randomDate(start, end) {
+        return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString().slice(0, 10);
+    }
+
+    // --- Data Generators ---
+    function generateScheduleForGroup(grp) {
+        if (!db.schedule[grp]) db.schedule[grp] = {};
+        
+        DAYS.forEach(day => {
+            db.schedule[grp][day] = [];
+            const lessonsCount = Math.floor(Math.random() * 3) + 3; 
+            const randomTimes = TIMESLOTS.slice(0, lessonsCount).sort(() => 0.5 - Math.random());
+            
+            for(let i=0; i<lessonsCount; i++) {
+                const availableSubjects = Object.keys(db.subjects);
+                if (availableSubjects.length === 0) continue;
+
+                const sub = getRandomItem(availableSubjects);
+                const subData = db.subjects[sub];
+                
+                db.schedule[grp][day].push({
+                    time: randomTimes[i],
+                    subject: sub,
+                    teacher: subData.teacherName,
+                    teacherId: subData.teacherId,
+                    room: `Ауд. ${Math.floor(Math.random() * 200) + 101}`,
+                    type: Math.random() > 0.7 ? 'Лабораторная' : 'Лекция'
+                });
+            }
+        });
+    }
+
+    function generateSchedule() {
+        db.schedule = {}; 
+        db.groups.forEach(generateScheduleForGroup);
+    }
+    
+    // Full initial data setup (only runs if no localStorage data found)
+    function setupInitialData() {
+        console.log("Generating initial data (no localStorage found)...");
+        const names = ["Айбек", "Алина", "Бакыт", "Гуля", "Дамир", "Елена", "Жанна", "Замир", "Иван", "Катя", "Нурлан", "Самал", "Тимур", "Вера", "Арман", "Дина"];
+        const surnames = ["Алиев", "Ким", "Иванов", "Попов", "Смитт", "Осмонов", "Садыков", "Ковалев", "Жумалиев", "Петров", "Васильев", "Турсунов", "Молдобеков", "Кубатова"];
+        
+        // 1. Director Setup
+        db.director = { 
+            id: 999, 
+            name: 'Александр Борисович', 
+            username: 'admin', 
+            password: '123', 
+            email: 'director@educlick.kz', 
+            since: '2015-09-01', 
+            phone: '+7-700-111-1111',
+            address: 'г. Алматы, ул. Абая, 150',
+            bankAcc: 'KZ123456789012345678',
+            department: DEPARTMENTS_DATA[0].name
+        };
+        
+        // 2. Generate Teachers
+        let teacherIdCounter = 100;
+        let subjectIndex = 0;
+        db.teachers = [];
+        
+        DEPARTMENTS_DATA.slice(2).forEach(dept => { 
+            for(let i=0; i<4; i++) { 
+                teacherIdCounter++;
+                const isHead = (i === 0 && dept.head !== undefined);
+
+                let assignedSubjects = [];
+                for(let j=0; j<Math.floor(Math.random() * 2) + 2; j++) {
+                     assignedSubjects.push(SUBJECTS[subjectIndex % SUBJECTS.length]);
+                     subjectIndex++;
+                }
+
+                const newTeacher = {
+                    id: teacherIdCounter,
+                    name: isHead ? dept.head : `${getRandomItem(names)} ${getRandomItem(surnames)}`,
+                    subjects: [...new Set(assignedSubjects)],
+                    username: `teacher${teacherIdCounter}`,
+                    password: '123',
+                    phone: `+7-701-${1000000 + teacherIdCounter}`,
+                    experience: Math.floor(Math.random() * 20) + 3,
+                    rank: getRandomItem(RANKS),
+                    department: dept.name,
+                    address: `г. Астана, ул. Кабанбай, ${teacherIdCounter}`,
+                    bankAcc: `KZ${Math.floor(Math.random() * 9000000000000000) + 1000000000000000}`
+                };
+                
+                db.teachers.push(newTeacher);
+            }
+        });
+        
+        // 3. Create Subject Mapping 
+        db.subjects = {};
+        db.teachers.forEach(t => {
+            t.subjects.forEach(sub => {
+                if (!db.subjects[sub]) {
+                    db.subjects[sub] = { teacherId: t.id, teacherName: t.name, department: t.department };
+                }
+            });
+        });
+
+        // 4. Generate 600 Students
+        let studentIdCounter = 0;
+        db.students = [];
+        db.groups.forEach(grp => {
+            for(let i=1; i<=STUDENTS_PER_GROUP; i++) {
+                studentIdCounter++;
+                const username = `student${studentIdCounter}`;
+                const birthDate = randomDate(new Date(2000, 0, 1), new Date(2005, 0, 1));
+                const status = Math.random() > 0.9 ? 'Академ. отпуск' : 'Активен';
+
+                const student = {
+                    id: studentIdCounter,
+                    name: `${getRandomItem(names)} ${getRandomItem(surnames)}`,
+                    username: username,
+                    password: '123',
+                    group: grp,
+                    phone: `+7-707-${1000000 + studentIdCounter}`,
+                    email: `${username}@educlick.kz`,
+                    dob: birthDate,
+                    status: status,
+                    address: `г. Бишкек, мкр. ${Math.floor(Math.random() * 12) + 1}, д.${Math.floor(Math.random() * 100)}`,
+                    progress: {}
+                };
+                
+                // Assign 5 random subjects
+                const studentSubjects = Object.keys(db.subjects).sort(() => 0.5 - Math.random()).slice(0, 5);
+                studentSubjects.forEach(sub => {
+                    student.progress[sub] = {
+                        misses: Math.floor(Math.random() * 5), 
+                        otrobotki: [],
+                        lessonsDone: Math.floor(Math.random() * 15) + 5,
+                        lessonsTotal: 25 
+                    };
+                    for(let k=0; k<student.progress[sub].misses; k++) {
+                        if(Math.random() > 0.5) student.progress[sub].otrobotki.push(getRandomItem(TOPICS));
+                    }
+                });
+                db.students.push(student);
+            }
+        });
+        
+        // 5. Generate Schedule
+        generateSchedule();
+        saveDB(); // Save generated data
+    }
+    
+    // Check localStorage on load, generate if empty
+    if (!loadDB()) {
+        setupInitialData();
+    }
+
+
+    // #################################################################################
+    // ##                           2. STATE & AUTH MANAGEMENT                        ##
+    // #################################################################################
+
+    let currentUser = null;
+    let currentRole = null;
+    let currentTab = 'dashboard';
+    let automationInterval = null;
+    
+    // State for Director Admin Pagination
+    let adminCurrentPage = 1;
+    let adminTotalPages = Math.ceil(db.students.length / STUDENTS_PER_PAGE);
+
+    let teacherView = { 
+        group: db.groups[0], 
+        subject: db.teachers.length > 0 ? db.teachers.find(t => t.subjects.length > 0)?.subjects[0] || SUBJECTS[0] : SUBJECTS[0] 
+    };
+
+    function handleLogin() {
+        const username = document.getElementById('login-username').value;
+        const password = document.getElementById('login-password').value;
+        const errorEl = document.getElementById('login-error-message');
+        errorEl.textContent = '';
+
+        let user = null;
+        let role = null;
+
+        if (db.director.username === username && db.director.password === password) {
+            user = db.director; role = 'director';
+        } else if (user = db.teachers.find(t => t.username === username && t.password === password)) {
+            role = 'teacher';
+        } else if (user = db.students.find(s => s.username === username && s.password === password)) {
+            role = 'student';
+        }
+
+        if (user) {
+            login(role, user);
+        } else {
+            errorEl.textContent = 'Неверный логин или пароль.';
+        }
+    }
+
+    function login(role, user) {
+        currentUser = user;
+        currentRole = role;
+        
+        // Reset admin pagination state upon login
+        adminTotalPages = Math.ceil(db.students.length / STUDENTS_PER_PAGE);
+        adminCurrentPage = 1; 
+
+        // Настройка меню
+        document.getElementById('teacher-journal-tab').classList.toggle('hidden', role !== 'teacher');
+        document.getElementById('admin-tab').classList.toggle('hidden', role !== 'director');
+        document.getElementById('director-departments-tab').classList.toggle('hidden', role !== 'director');
+
+
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app-container').classList.remove('hidden');
+        document.getElementById('app-container').style.display = 'flex';
+
+        document.getElementById('user-name').innerText = user.name;
+        document.getElementById('user-role').innerText = role.toUpperCase();
+        
+        startAutomation();
+        switchTab(currentTab);
+    }
+
+    function logout() {
+        location.reload(); 
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelector(`.nav-item[onclick="switchTab('${tab}')"]`).classList.add('active');
+        render();
+    }
+
+    function showToast(msg, type='info') {
+        const toast = document.getElementById('toast');
+        const color = type === 'danger' ? 'var(--danger)' : type === 'success' ? 'var(--success)' : 'var(--primary)';
+        
+        toast.style.borderLeft = `5px solid ${color}`;
+        toast.style.backgroundColor = 'var(--bg-card)';
+        toast.style.color = 'var(--text-main)';
+        toast.innerHTML = `<i class="fa-solid fa-bell" style="color:${color}"></i> <span>${msg}</span>`;
+        
+        toast.style.visibility = 'visible';
+        toast.style.opacity = '1';
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.visibility = 'hidden';
+        }, 3000); 
+    }
+
+    // Automation (для демонстрации динамики)
+    function startAutomation() {
+        if(automationInterval) clearInterval(automationInterval);
+
+        automationInterval = setInterval(() => {
+            const activeStudents = db.students.filter(s => s.status === 'Активен' && Object.keys(s.progress).length > 0);
+            if (activeStudents.length === 0) return;
+            
+            const s = getRandomItem(activeStudents);
+            const subs = Object.keys(s.progress);
+            if(subs.length === 0) return;
+            
+            const sub = getRandomItem(subs);
+            
+            s.progress[sub].misses++;
+            s.progress[sub].otrobotki.push(getRandomItem(TOPICS));
+            
+            saveDB(); 
+            
+            showToast(`Авто-НБ: ${s.name} (${sub}) - Студент не явился на пару!`, 'danger');
+            if(currentRole === 'student' && s.id === currentUser.id) render(); 
+        }, 60000); // Раз в минуту
+    }
+    
+    // Director Pagination Handler
+    window.setAdminPage = function(newPage) {
+        if (newPage >= 1 && newPage <= adminTotalPages) {
+            adminCurrentPage = newPage;
+            render();
+        }
+    }
+
+
+    // #################################################################################
+    // ##                           3. MAIN RENDERER & ROUTER                         ##
+    // #################################################################################
+
+    function render() {
+        const content = document.getElementById('content-area');
+        content.innerHTML = '';
+
+        if(currentTab === 'schedule') {
+            renderSchedule(content);
+            return;
+        }
+        if(currentTab === 'departments' && currentRole === 'director') {
+            renderDepartments(content);
+            return;
+        }
+
+        if(currentTab === 'admin' && currentRole === 'director') {
+            renderDirectorAdmin(content);
+            return;
+        }
+        
+        if(currentTab === 'journal' && currentRole === 'teacher') {
+            renderTeacherJournal(content);
+            return;
+        }
+
+        // Default: Dashboard/Profile
+        if(currentRole === 'student') renderStudentDashboard(content);
+        if(currentRole === 'teacher') renderTeacherProfile(content);
+        if(currentRole === 'director') renderDirectorProfile(content);
+    }
+    
+    // #################################################################################
+    // ##                           4. RENDERER MODULES (VIEWS)                       ##
+    // #################################################################################
+
+    // --- RENDERER: General Profile Details Helper ---
+    function renderProfileDetails(user, role) {
+        let details = '';
+        if (role === 'director') {
+             details = `
+                <div class="detail-grid"><div class="detail-label">Логин</div><div>${user.username}</div></div>
+                <div class="detail-grid"><div class="detail-label">Пароль</div><div><span class="badge badge-danger" style="letter-spacing: 1px;">${user.password}</span></div></div>
+                <div class="detail-grid"><div class="detail-label">Email</div><div>${user.email}</div></div>
+                <div class="detail-grid"><div class="detail-label">Телефон</div><div>${user.phone}</div></div>
+                <div class="detail-grid"><div class="detail-label">Адрес</div><div>${user.address}</div></div>
+                <div class="detail-grid"><div class="detail-label">На посту с</div><div>${user.since}</div></div>
+                <h4 style="margin-top: 15px; color: var(--warning);"><i class="fa-solid fa-bank"></i> Финансовые данные (Имитация)</h4>
+                <div class="detail-grid"><div class="detail-label">Департамент</div><div><span class="badge" style="background:rgba(245,158,11,0.2); color:var(--warning);">${user.department}</span></div></div>
+                <div class="detail-grid"><div class="detail-label">Банковский счет</div><div>${user.bankAcc}</div></div>
+            `;
+        } else if (role === 'teacher') {
+            details = `
+                <div class="detail-grid"><div class="detail-label">Логин</div><div>${user.username}</div></div>
+                <div class="detail-grid"><div class="detail-label">Телефон</div><div>${user.phone}</div></div>
+                <div class="detail-grid"><div class="detail-label">Адрес</div><div>${user.address}</div></div>
+                <div class="detail-grid"><div class="detail-label">Стаж</div><div>${user.experience} лет</div></div>
+                <div class="detail-grid"><div class="detail-label">Звание</div><div><span class="badge badge-warn">${user.rank}</span></div></div>
+                <h4 style="margin-top: 15px; color: var(--warning);"><i class="fa-solid fa-bank"></i> Административные данные</h4>
+                <div class="detail-grid"><div class="detail-label">Департамент</div><div><span class="badge" style="background:rgba(99,102,241,0.2); color:var(--primary);">${user.department}</span></div></div>
+                <div class="detail-grid"><div class="detail-label">Банковский счет</div><div>${user.bankAcc}</div></div>
+                <h4 style="margin-top: 15px; color: var(--success);"><i class="fa-solid fa-book"></i> Предметы</h4>
+                <p class="text-sm">${user.subjects.join(', ')}</p>
+            `;
+        } else if (role === 'student') {
+            details = `
+                <div class="detail-grid"><div class="detail-label">Группа</div><div><span class="badge" style="background:rgba(99,102,241,0.2); color:var(--primary);">${user.group}</span></div></div>
+                <div class="detail-grid"><div class="detail-label">Email</div><div>${user.email}</div></div>
+                <div class="detail-grid"><div class="detail-label">Телефон</div><div>${user.phone}</div></div>
+                <div class="detail-grid"><div class="detail-label">Дата рождения</div><div>${user.dob}</div></div>
+                <div class="detail-grid"><div class="detail-label">Адрес</div><div>${user.address}</div></div>
+                <div class="detail-grid"><div class="detail-label">Статус</div><div><span class="badge ${user.status === 'Активен' ? 'badge-success' : 'badge-red'}">${user.status}</span></div></div>
+            `;
+        }
+        return `<div class="card">
+            <h3 style="margin-bottom: 20px; color: var(--primary);"><i class="fa-solid fa-address-card"></i> Личные и Административные данные</h3>
+            ${details}
+        </div>`;
+    }
+
+    // --- RENDERER: Director Profile (MODIFIED to show password) ---
+    function renderDirectorProfile(container) {
+        document.getElementById('page-title').innerText = "Профиль Директора и Обзор Системы";
+        
+        let totalDebt = 0;
+        let totalMisses = 0;
+        let activeStudents = 0;
+        db.students.forEach(s => { 
+            Object.values(s.progress).forEach(p => { totalMisses += p.misses; });
+            if (s.status === 'Активен') activeStudents++;
+        });
+        totalDebt = totalMisses * MISS_FEE;
+
+        container.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-box" style="border-left: 4px solid var(--danger);">
+                    <div class="stat-label">Общий долг студентов</div>
+                    <div class="stat-value text-danger">${totalDebt.toLocaleString()} сом</div>
+                </div>
+                <div class="stat-box" style="border-left: 4px solid var(--primary);">
+                    <div class="stat-label">Всего студентов (Активно)</div>
+                    <div class="stat-value">${db.students.length} (${activeStudents})</div>
+                </div>
+                <div class="stat-box" style="border-left: 4px solid var(--success);">
+                    <div class="stat-label">Всего преподавателей</div>
+                    <div class="stat-value">${db.teachers.length}</div>
+                </div>
+                <div class="stat-box" style="border-left: 4px solid var(--warning);">
+                    <div class="stat-label">Учебных групп</div>
+                    <div class="stat-value">${db.groups.length}</div>
+                </div>
+            </div>
+            
+            ${renderProfileDetails(currentUser, 'director')}
+            
+            <button class="btn btn-secondary" style="margin-top: 20px;" onclick="actSimulateAudit()"><i class="fa-solid fa-gears"></i> Запустить ежегодный Аудит</button>
+        `;
+    }
+
+    // --- RENDERER: Teacher Profile (unchanged) ---
+    function renderTeacherProfile(container) {
+        document.getElementById('page-title').innerText = "Профиль Преподавателя";
+        
+        let totalTaughtStudents = db.students.filter(s => Object.keys(s.progress).some(sub => currentUser.subjects.includes(sub))).length;
+        let totalMisses = db.students.reduce((sum, s) => {
+            return sum + Object.entries(s.progress).reduce((subSum, [sub, p]) => {
+                return subSum + (currentUser.subjects.includes(sub) ? p.misses : 0);
+            }, 0);
+        }, 0);
+
+        container.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-box" style="border-left: 4px solid var(--primary);">
+                    <div class="stat-label">Обучаемые студенты</div>
+                    <div class="stat-value">${totalTaughtStudents}</div>
+                </div>
+                <div class="stat-box" style="border-left: 4: 4px solid var(--danger);">
+                    <div class="stat-label">НБ по моим предметам</div>
+                    <div class="stat-value text-danger">${totalMisses}</div>
+                </div>
+            </div>
+            ${renderProfileDetails(currentUser, 'teacher')}
+            <button class="btn btn-warn" style="margin-top: 20px;" onclick="actRequestSupplies()"><i class="fa-solid fa-truck"></i> Запросить учебные материалы</button>
+        `;
+    }
+    
+    // --- RENDERER: Student Dashboard (Complex View - MODIFIED) ---
+    function renderStudentDashboard(container) {
+        document.getElementById('page-title').innerText = `Профиль Студента (${currentUser.group})`;
+
+        let totalMisses = 0;
+        let totalTopics = 0;
+        // Check if progress is empty (for newly added students)
+        if (Object.keys(currentUser.progress).length > 0) {
+            Object.values(currentUser.progress).forEach(p => {
+                totalMisses += p.misses;
+                totalTopics += p.otrobotki.length;
+            });
+        }
+        
+        const totalCost = totalMisses * MISS_FEE;
+        
+        // This calculates the average progress, which will be NaN/0 if progress is empty.
+        const avgProgress = Math.round(Object.values(currentUser.progress).reduce((sum, p) => sum + (p.lessonsDone / p.lessonsTotal), 0) / Object.keys(currentUser.progress).length * 100) || 0;
+
+
+        container.innerHTML = `
+            ${renderProfileDetails(currentUser, 'student')}
+
+            <h3 style="margin-bottom: 20px; color: var(--primary);"><i class="fa-solid fa-list-check"></i> Финансовая и Академическая Задолженность</h3>
+
+            <div class="stats-grid">
+                <div class="stat-box" style="border-left: 4px solid var(--danger);">
+                    <div class="stat-label">Общий НБ</div>
+                    <div class="stat-value text-danger">${totalMisses}</div>
+                    <div class="text-sm text-muted">Штраф: ${totalCost.toLocaleString()} сом</div>
+                </div>
+                <div class="stat-box" style="border-left: 4px solid var(--warning);">
+                    <div class="stat-label">Темы для отработки</div>
+                    <div class="stat-value text-warning">${totalTopics}</div>
+                    <button class="btn btn-warn w-full" style="margin-top: 5px; font-size: 11px;" onclick="actRequestOtr()"><i class="fa-solid fa-calendar-check"></i> Записаться на отработку</button>
+                </div>
+                <div class="stat-box" style="border-left: 4px solid var(--success);">
+                    <div class="stat-label">Средний прогресс</div>
+                    <div class="stat-value">${avgProgress}%</div>
+                    <div class="text-sm text-muted">По всем предметам</div>
+                </div>
+            </div>
+
+            <div class="card table-responsive">
+                <h4 style="margin-bottom: 15px; font-weight: 600;">Детализация долгов по предметам</h4>
+                
+                ${Object.keys(currentUser.progress).length === 0 ? 
+                    `<div class="text-muted" style="text-align:center;">У вас пока не закреплены предметы. Обратитесь в Учебную Часть.</div>` :
+                    `
+                    <table class="debt-table">
+                        <thead><tr><th>Предмет</th><th>Преподаватель</th><th>НБ</th><th>Отработки</th><th>Прогресс</th></tr></thead>
+                        <tbody>
+                            ${Object.entries(currentUser.progress).map(([sub, p]) => `
+                                <tr>
+                                    <td>${sub}</td>
+                                    <td>${db.subjects[sub]?.teacherName || 'Неизвестен'}</td>
+                                    <td>${p.misses > 0 ? `<span class="badge badge-red">${p.misses}</span>` : 'Чисто'}</td>
+                                    <td>${p.otrobotki.length > 0 ? `<span class="badge badge-warn">${p.otrobotki.length} тем</span>` : 'Нет'}</td>
+                                    <td>${Math.round(p.lessonsDone/p.lessonsTotal*100)}%</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    `
+                }
+            </div>
+
+            <h3 style="margin-bottom: 20px; margin-top: 30px; color: var(--primary);"><i class="fa-solid fa-calendar-alt"></i> Мое Расписание на Неделю</h3>
+            <div class="card">${renderStudentScheduleOnly(currentUser.group)}</div>
+        `;
+    }
+    
+    // --- RENDERER: Schedule Widget (re-usable) ---
+    function renderStudentScheduleOnly(group) {
+        let html = `<div class="schedule-grid">`;
+        const scheduleData = db.schedule[group];
+
+        if(!scheduleData) return `<div>Расписание для группы **${group}** не найдено.</div>`;
+        
+        // Ensure 5 day structure, even if a day has no lessons
+        DAYS.forEach(day => {
+            const lessons = scheduleData[day] || [];
+            let lessonsHtml = lessons.map(l => `
+                <div class="lesson-row">
+                    <span class="lesson-time">${l.time} - ${l.room}</span>
+                    <div class="font-bold">${l.subject}</div>
+                    <div class="text-sm text-muted">${l.teacher} (${l.type})</div>
+                </div>
+            `).join('');
+
+            html += `
+                <div class="schedule-day">
+                    <div class="day-title">${day}</div>
+                    ${lessonsHtml || '<div class="text-muted text-sm" style="text-align:center;">Нет занятий</div>'}
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+        return html;
+    }
+
+
+    // --- RENDERER: Full Schedule Page (unchanged) ---
+    function renderSchedule(container) {
+        document.getElementById('page-title').innerText = "Полное Расписание занятий";
+        
+        let targetGroup = currentUser.group || teacherView.group || db.groups[0]; 
+        
+        if(currentRole !== 'student') {
+            container.innerHTML += `
+                <div class="control-bar">
+                    <label>Просмотр для группы:</label>
+                    <select onchange="teacherView.group = this.value; render()">
+                        ${db.groups.map(g => `<option value="${g}" ${g===targetGroup?'selected':''}>${g}</option>`).join('')}
+                    </select>
+                </div>
+            `;
+            targetGroup = teacherView.group;
+        }
+
+        container.innerHTML += `<div class="card">${renderStudentScheduleOnly(targetGroup)}</div>`;
+    }
+
+    // --- RENDERER: Departments View (Director only - unchanged) ---
+    function renderDepartments(container) {
+        document.getElementById('page-title').innerText = "Структура Колледжа: Отделы и Кафедры";
+        
+        let html = '<div class="detail-full-grid">';
+        
+        db.departments.forEach(dept => {
+            const members = db.teachers.filter(t => t.department === dept.name).map(t => t.name);
+            const subjectsTaught = Object.values(db.subjects).filter(s => s.department === dept.name).map(s => s.teacherName).length;
+            
+            html += `
+                <div class="card dept-card" style="border-left: 5px solid var(--warning);">
+                    <h4 style="color: var(--warning); margin-bottom: 10px;"><i class="fa-solid fa-building"></i> ${dept.name}</h4>
+                    <div class="detail-grid"><div class="detail-label">Глава отдела:</div><div class="font-bold">${dept.head}</div></div>
+                    <div class="detail-grid"><div class="detail-label">Обязанности:</div><div class="text-sm text-muted">${dept.duties}</div></div>
+                    
+                    <h5 style="margin-top: 15px; font-weight: 600;">Статистика:</h5>
+                    <div class="detail-grid"><div class="detail-label">Сотрудников:</div><div>${members.length}</div></div>
+                    <div class="detail-grid"><div class="detail-label">Закреплено предметов:</div><div>${subjectsTaught}</div></div>
+                    
+                    <button class="btn btn-secondary w-full" style="margin-top: 15px; font-size: 12px;" onclick="actViewDeptStaff('${dept.name}')"><i class="fa-solid fa-users"></i> Просмотр сотрудников</button>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        container.innerHTML += html;
+    }
+
+
+    // --- RENDERER: Teacher Journal (Actions - unchanged) ---
+    function renderTeacherJournal(container) {
+        document.getElementById('page-title').innerText = "Журнал (Учет Пропусков и Отработок)";
+
+        const mySubjects = currentUser.subjects;
+        
+        container.innerHTML += `
+            <div class="control-bar">
+                <div class="flex items-center gap-2">
+                    <label>Предмет:</label>
+                    <select onchange="teacherView.subject = this.value; render()">
+                        ${mySubjects.map(s => `<option ${s===teacherView.subject?'selected':''}>${s}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label>Группа:</label>
+                    <select onchange="teacherView.group = this.value; render()">
+                        ${db.groups.map(g => `<option value="${g}" ${g===teacherView.group?'selected':''}>${g}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="btn btn-primary" onclick="actAddStudentToGroup()"><i class="fa-solid fa-user-plus"></i> Добавить Студента в ${teacherView.group}</button>
+                </div>
+                <div class="flex items-center gap-2" style="margin-left:auto;">
+                    <button class="btn btn-primary" onclick="actAddGroup('director')"><i class="fa-solid fa-plus"></i> Создать группу</button>
+                    <button class="btn btn-primary" onclick="actTeacherAddSubject()"><i class="fa-solid fa-book"></i> Добавить Предмет</button>
+                </div>
+            </div>
+        `;
+        
+        const students = db.students.filter(s => s.group === teacherView.group);
+        const validStudents = students.filter(s => s.progress[teacherView.subject]);
+
+        if (students.length === 0) {
+            container.innerHTML += `<div class="card" style="text-align:center; color:var(--text-muted);">В группе ${teacherView.group} пока нет студентов. Добавьте первого!</div>`;
+            return;
+        }
+
+        if (validStudents.length === 0 && students.length > 0) {
+             container.innerHTML += `<div class="card" style="text-align:center; color:var(--text-muted);">Студенты в группе ${teacherView.group} не изучают предмет "${teacherView.subject}".</div>`;
+             return;
+        }
+
+
+        let rows = validStudents.map(s => {
+            const p = s.progress[teacherView.subject];
+            const hasDebt = p.misses > 0;
+            const hasWork = p.otrobotki.length > 0;
+
+            return `
+                <tr>
+                    <td><div class="font-bold">${s.name}</div></td>
+                    <td><span class="badge ${hasDebt ? 'badge-red' : 'badge-green'}">${p.misses} НБ</span></td>
+                    <td><span class="badge ${hasWork ? 'badge-warn' : 'badge-green'}">${p.otrobotki.length} тем</span></td>
+                    <td>
+                        <div class="flex flex-col gap-2">
+                            <button class="btn btn-danger w-full" onclick="actAddMiss(${s.id})"><i class="fa-solid fa-plus"></i> + НБ</button>
+                            <button class="btn btn-warn w-full" onclick="actAddTopic(${s.id})"><i class="fa-solid fa-file-circle-plus"></i> + Тема</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="flex flex-col gap-2">
+                            <button class="btn btn-success w-full" ${!hasDebt ? 'disabled' : ''} onclick="actCloseMiss(${s.id})"><i class="fa-solid fa-money-bill-wave"></i> Оплатить 1 НБ</button>
+                            <button class="btn btn-primary w-full" ${!hasWork ? 'disabled' : ''} onclick="actCloseTopic(${s.id})"><i class="fa-solid fa-check"></i> Сдать 1 тему</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        container.innerHTML += `
+            <div class="card table-responsive">
+                <table>
+                    <thead><tr><th>Студент</th><th>Пропуски</th><th>Отработки</th><th>Начислить</th><th>Закрыть</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // --- RENDERER: Director Admin (CRUD - unchanged) ---
+    function renderDirectorAdmin(container) {
+        document.getElementById('page-title').innerText = "Управление Пользователями (CRUD)";
+        
+        // Pagination logic for students
+        const totalStudents = db.students.length;
+        adminTotalPages = Math.ceil(totalStudents / STUDENTS_PER_PAGE);
+        const startIndex = (adminCurrentPage - 1) * STUDENTS_PER_PAGE;
+        const endIndex = startIndex + STUDENTS_PER_PAGE;
+        const studentsOnPage = db.students.slice(startIndex, endIndex);
+
+        container.innerHTML = `
+            <div class="card">
+                <h3 class="font-bold" style="margin-bottom:15px; color: var(--primary);">1. Управление (Добавление/Удаление)</h3>
+                <div class="flex gap-4 items-center" style="margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="actAddUser('teacher')"><i class="fa-solid fa-user-plus"></i> Добавить Преподавателя</button>
+                    <button class="btn btn-primary" onclick="actAddUser('student')"><i class="fa-solid fa-user-graduate"></i> Добавить Студента</button>
+                    <button class="btn btn-success" onclick="actAddGroup('director')"><i class="fa-solid fa-users-viewfinder"></i> Создать Группу</button>
+                    <button class="btn btn-primary" onclick="actAddSubject()"><i class="fa-solid fa-book"></i> Добавить Предмет</button>
+                    <button class="btn btn-danger" onclick="actRemoveUser('student', db.students[db.students.length-1].id)"><i class="fa-solid fa-trash"></i> Удалить посл. студ. (ID: ${db.students[db.students.length-1]?.id || 'N/A'})</button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 class="font-bold" style="margin-bottom:15px; color: var(--primary);">2. Логины и Пароли Преподавателей (${db.teachers.length} чел.)</h3>
+                <div class="table-responsive">
+                    <table style="font-size: 13px;">
+                        <thead><tr><th>ФИО</th><th>Логин</th><th>Пароль</th><th>Отдел</th><th>ID</th></tr></thead>
+                        <tbody>
+                            ${db.teachers.map(t => `
+                                <tr>
+                                    <td>${t.name}</td>
+                                    <td><span class="font-bold">${t.username}</span></td>
+                                    <td><span class="badge badge-danger">${t.password}</span></td>
+                                    <td>${t.department}</td>
+                                    <td>${t.id}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="font-bold" style="margin-bottom:15px; color: var(--success);">3. Логины и Пароли Студентов (Всего: ${totalStudents} чел.)</h3>
+                <div class="table-responsive">
+                    <table style="font-size: 13px;">
+                        <thead><tr><th>ФИО</th><th>Группа</th><th>Логин</th><th>Пароль</th><th>ID</th><th>Статус</th><th>Действия</th></tr></thead>
+                        <tbody>
+                            ${studentsOnPage.map(s => `
+                                <tr>
+                                    <td>${s.name}</td>
+                                    <td><span class="badge" style="background:rgba(99,102,241,0.2); color:var(--primary);">${s.group}</span></td>
+                                    <td><span class="font-bold">${s.username}</span></td>
+                                    <td><span class="badge badge-danger">${s.password}</span></td>
+                                    <td>${s.id}</td>
+                                    <td><span class="badge ${s.status === 'Активен' ? 'badge-success' : 'badge-red'}">${s.status}</span></td>
+                                    <td>
+                                        <button class="btn btn-secondary" onclick="actChangeStudentGroup(${s.id}, '${s.group}')" title="Перекинуть в другую группу"><i class="fa-solid fa-repeat"></i> Группа</button>
+                                        <button class="btn btn-danger" onclick="actRemoveUser('student', ${s.id})" title="Удалить студента"><i class="fa-solid fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination-controls">
+                    <button class="btn btn-secondary" onclick="setAdminPage(${adminCurrentPage - 1})" ${adminCurrentPage === 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i> Предыдущая</button>
+                    <span class="text-sm">Страница ${adminCurrentPage} из ${adminTotalPages}</span>
+                    <button class="btn btn-secondary" onclick="setAdminPage(${adminCurrentPage + 1})" ${adminCurrentPage === adminTotalPages ? 'disabled' : ''}>Следующая <i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+            
+            <button class="btn btn-danger" onclick="clearAllData()" style="margin-top: 20px;"><i class="fa-solid fa-bomb"></i> Очистить LocalStorage (Сбросить все данные)</button>
+        `;
+    }
+
+
+    // #################################################################################
+    // ##                           5. ACTIONS MODULE (MODIFIED)      ##
+    // #################################################################################
+    
+    // Director/Admin Actions
+    window.clearAllData = function() {
+        if(confirm("ВНИМАНИЕ! Вы уверены, что хотите полностью очистить все данные и сбросить систему?")) {
+            localStorage.removeItem(DB_KEY);
+            showToast("Все данные удалены. Перезагрузка...", 'danger');
+            setTimeout(() => location.reload(), 1000);
+        }
+    }
+
+    window.actSimulateAudit = function() {
+        showToast('Процесс Аудита запущен! Проверяется 600+ студентов и 20+ групп...', 'info');
+        setTimeout(() => {
+            showToast('Аудит успешно завершен. Обнаружено 1547 пропусков.', 'success');
+        }, 1500);
+    }
+    window.actViewDeptStaff = function(deptName) {
+        const staff = db.teachers.filter(t => t.department === deptName);
+        let staffList = staff.map(t => `${t.name} (${t.rank})`).join('\n- ');
+        alert(`Сотрудники отдела "${deptName}":\n\n- ${staffList || 'Нет сотрудников'}`);
+    }
+    
+    // MODIFIED: Added default progress for new student
+    window.actAddUser = function(role) {
+        const name = prompt(`Введите ФИО нового ${role === 'teacher' ? 'преподавателя' : 'студента'}:`);
+        if (!name) return;
+        
+        let newUser = {};
+        if (role === 'teacher') {
+            const id = Math.max(...db.teachers.map(t => t.id)) + 1;
+            newUser = { id: id, name: name, subjects: ['Новый предмет'], username: `teacher${id}`, password: '123', phone: `+7-701-${1000000 + id}`, experience: 0, rank: 'Новичок', department: db.departments[2].name, address: 'Уточняется', bankAcc: 'Уточняется' };
+            db.teachers.push(newUser);
+            showToast(`Преподаватель ${name} добавлен! Логин: ${newUser.username}`, 'success');
+        } else {
+            // New logic for student group selection
+            const groupList = db.groups.join(', ');
+            const group = prompt(`Выберите группу для студента ${name}:\n\nДоступные группы: ${groupList}\n\n(Введите название группы)`);
+            if (!group || !db.groups.includes(group)) {
+                 showToast(`Ошибка: Группа "${group || 'не указана'}" не найдена. Создайте ее сначала.`, 'danger');
+                 return;
+            }
+            
+            const defaultPass = '123'; // Standard default password
+            const id = Math.max(...db.students.map(s => s.id)) + 1;
+            const username = `student${id}`;
+            const firstSubject = Object.keys(db.subjects).length > 0 ? Object.keys(db.subjects)[0] : 'Математика'; // Fallback subject if subjects list is empty
+            
+            // Generate basic progress for one subject to prevent errors in dashboard rendering
+            let initialProgress = {};
+            if (firstSubject) {
+                initialProgress[firstSubject] = { misses: 0, otrobotki: [], lessonsDone: 0, lessonsTotal: 25 };
+            }
+
+            newUser = { 
+                id: id, 
+                name: name, 
+                username: username, 
+                password: defaultPass, // Added password to object
+                group: group, 
+                progress: initialProgress, // Added initial progress
+                phone: `+7-707-${1000000 + id}`, 
+                email: `${username}@educlick.kz`, 
+                dob: randomDate(new Date(2000, 0, 1), new Date(2005, 0, 1)), 
+                status: 'Активен', 
+                address: 'Уточняется' 
+            };
+            db.students.push(newUser);
+            showToast(`Студент ${name} добавлен в группу ${group}! Логин: ${newUser.username}, Пароль: ${defaultPass}`, 'success');
+            
+            // Re-calculate pagination pages
+            adminTotalPages = Math.ceil(db.students.length / STUDENTS_PER_PAGE); 
+        }
+        
+        saveDB();
+        render();
+    }
+    window.actRemoveUser = function(role, id) {
+        if (!confirm(`Вы уверены, что хотите удалить пользователя ID ${id}? Это необратимо!`)) return;
+
+        if (role === 'teacher') {
+            db.teachers = db.teachers.filter(t => t.id !== id);
+        } else {
+            db.students = db.students.filter(s => s.id !== id);
+            // Re-calculate pagination pages
+            adminTotalPages = Math.ceil(db.students.length / STUDENTS_PER_PAGE);
+            if (adminCurrentPage > adminTotalPages) adminCurrentPage = adminTotalPages;
+        }
+        showToast(`Пользователь ID ${id} удален из системы.`, 'danger');
+        saveDB();
+        render();
+    }
+    window.actAddSubject = function() {
+        const newSubject = prompt("Введите название нового предмета:");
+        if (!newSubject) return;
+
+        const defaultTeacher = db.teachers.find(t => t.department === 'Кафедра IT') || db.teachers[0];
+        if (!defaultTeacher) { showToast(`Ошибка: Нет преподавателей для закрепления предмета!`, 'danger'); return; }
+        
+        db.subjects[newSubject] = { teacherId: defaultTeacher.id, teacherName: defaultTeacher.name, department: defaultTeacher.department };
+        defaultTeacher.subjects.push(newSubject); 
+
+        generateSchedule(); 
+        showToast(`Предмет "${newSubject}" добавлен и закреплен за ${defaultTeacher.name}.`, 'success');
+        saveDB();
+        render();
+    }
+    
+    // Перекинуть студента из группы в группу
+    window.actChangeStudentGroup = function(studentId, currentGroup) {
+        const student = db.students.find(s => s.id === studentId);
+        if (!student) return showToast('Студент не найден.', 'danger');
+
+        const availableGroups = db.groups.filter(g => g !== currentGroup);
+        if (availableGroups.length === 0) {
+            return showToast('Нет других групп для перемещения.', 'warning');
+        }
+
+        const groupList = availableGroups.join(', ');
+        const newGroup = prompt(`Переместить студента ${student.name} (текущая группа: ${currentGroup}) в какую группу?\n\nДоступные группы: ${groupList}`);
+
+        if (newGroup && db.groups.includes(newGroup)) {
+            student.group = newGroup;
+            showToast(`${student.name} успешно перемещен в группу ${newGroup}.`, 'success');
+            saveDB();
+            render();
+        } else if (newGroup) {
+             showToast(`Группа "${newGroup}" не найдена. Попробуйте еще раз.`, 'danger');
+        }
+    }
+
+
+    // Group Actions (Used by both Teacher and Director)
+    window.actAddGroup = function(callerRole) {
+        const newGroup = prompt("Введите название новой группы (например, ИТ-401):");
+        if (!newGroup) return;
+
+        if (db.groups.includes(newGroup)) {
+            showToast(`Группа ${newGroup} уже существует.`, 'warning');
+            return;
+        }
+        
+        db.groups.push(newGroup);
+        generateScheduleForGroup(newGroup); // Generate schedule for the new group
+        
+        if (callerRole === 'director') {
+             showToast(`Администратор: Группа ${newGroup} успешно создана, расписание сгенерировано.`, 'success');
+        } else {
+            // Teacher specific logic
+            teacherView.group = newGroup; 
+            showToast(`Преподаватель: Группа ${newGroup} успешно создана! Добавьте студентов.`, 'success');
+        }
+        
+        saveDB();
+        render();
+    }
+
+
+    // Teacher Actions (Subject Management)
+    window.actAddStudentToGroup = function() {
+        const group = teacherView.group;
+        const name = prompt(`Введите ФИО нового студента для группы ${group}:`);
+        if (!name) return;
+        
+        const id = Math.max(...db.students.map(s => s.id)) + 1;
+        const username = `student${id}`;
+        const birthDate = randomDate(new Date(2000, 0, 1), new Date(2005, 0, 1));
+        const defaultPass = '123';
+
+        const newUser = {
+            id: id, 
+            name: name, 
+            username: username, 
+            password: defaultPass,
+            group: group, 
+            progress: {}, 
+            phone: `+7-707-${1000000 + id}`, 
+            email: `${username}@educlick.kz`, 
+            dob: birthDate, 
+            status: 'Активен', 
+            address: 'Уточняется'
+        };
+        
+        const currentSub = teacherView.subject;
+        newUser.progress[currentSub] = { misses: 0, otrobotki: [], lessonsDone: 0, lessonsTotal: 25 };
+
+        db.students.push(newUser);
+        
+        showToast(`Студент ${name} добавлен в группу ${group} и ему назначен предмет ${currentSub}! Логин: ${username}, Пароль: ${defaultPass}`, 'success');
+        saveDB();
+        render();
+    }
+    window.actTeacherAddSubject = function() {
+        const newSubject = prompt("Введите название нового предмета, который вы будете преподавать:");
+        if (!newSubject) return;
+
+        if (db.subjects[newSubject]) {
+             showToast(`Предмет "${newSubject}" уже существует.`, 'warning');
+             return;
+        }
+        
+        const teacher = currentUser;
+        
+        db.subjects[newSubject] = { teacherId: teacher.id, teacherName: teacher.name, department: teacher.department };
+        teacher.subjects.push(newSubject); 
+        teacherView.subject = newSubject; 
+
+        generateSchedule();
+        showToast(`Предмет "${newSubject}" добавлен и закреплен за вами!`, 'success');
+        saveDB();
+        render();
+    }
+
+
+    // Journal Actions (Teacher)
+    window.actAddMiss = function(studentId) {
+        const s = db.students.find(st => st.id === studentId);
+        s.progress[teacherView.subject].misses++;
+        showToast(`+1 НБ для ${s.name} по ${teacherView.subject}`, 'danger');
+        saveDB();
+        render();
+    }
+    window.actAddTopic = function(studentId) {
+        const s = db.students.find(st => st.id === studentId);
+        const topic = prompt("Введите тему отработки:");
+        if (topic) {
+            s.progress[teacherView.subject].otrobotki.push(topic);
+            showToast(`Назначена тема: "${topic}" для ${s.name}`, 'warning');
+            saveDB();
+            render();
+        }
+    }
+    window.actCloseMiss = function(studentId) {
+        const s = db.students.find(st => st.id === studentId);
+        if (s.progress[teacherView.subject].misses > 0) {
+            s.progress[teacherView.subject].misses--;
+            showToast(`1 НБ закрыт (Оплата) для ${s.name}`, 'success');
+            saveDB();
+            render();
+        } else { showToast('Нет пропусков для закрытия.', 'warning'); }
+    }
+    window.actCloseTopic = function(studentId) {
+        const s = db.students.find(st => st.id === studentId);
+        if (s.progress[teacherView.subject].otrobotki.length > 0) {
+            const topic = s.progress[teacherView.subject].otrobotki.pop();
+            showToast(`Отработка по теме "${topic}" принята!`, 'success');
+            saveDB();
+            render();
+        } else { showToast('Нет тем для сдачи.', 'warning'); }
+    }
+
+    // Student Actions
+    window.actRequestOtr = function() {
+        const date = prompt("Введите желаемую дату для отработки (ДД.ММ):");
+        if (date) {
+            showToast(`Заявка на отработку на ${date} отправлена вашему преподавателю.`, 'info');
+        }
+    }
+    window.actRequestSupplies = function() {
+        const item = prompt("Введите, какие учебные материалы вы запрашиваете (например, маркеры для доски, реактивы):");
+        if (item) {
+            showToast(`Запрос на "${item}" отправлен в Административный Отдел. Ожидайте подтверждения.`, 'info');
+        }
+    }
+    
+</script>
+</body>
+</html>
